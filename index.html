@@ -1,195 +1,173 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DramaBox VIP Viewer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <title>DramaBox Nonton - Unofficial Streaming Sederhana</title>
     <style>
-        body { background-color: #0f0f0f; color: #e0e0e0; font-family: sans-serif; }
-        .navbar { background-color: #1a1a1a; border-bottom: 1px solid #333; }
-        .card { background-color: #1f1f1f; border: 1px solid #333; cursor: pointer; transition: 0.2s; }
-        .card:hover { transform: translateY(-5px); border-color: #ff4757; }
-        .card-img-top { height: 280px; object-fit: cover; }
-        .card-title { font-size: 0.9rem; color: white; margin-bottom: 0; }
-        .eps-badge { font-size: 0.7rem; background: #ff4757; color: white; padding: 2px 6px; border-radius: 4px; position: absolute; top: 10px; right: 10px; }
-        
-        /* Player Overlay */
-        #player-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: black; z-index: 9999; display: none; 
-            flex-direction: column; justify-content: center; align-items: center;
-        }
-        video { width: 100%; max-width: 800px; max-height: 80vh; }
-        .close-btn { position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem; cursor: pointer; }
+        body { font-family: Arial, sans-serif; background: #121212; color: #fff; margin: 0; padding: 0; }
+        header { background: #1f1f1f; padding: 20px; text-align: center; }
+        h1 { margin: 0; }
+        #search-bar { padding: 20px; text-align: center; }
+        input[type="text"] { padding: 10px; width: 80%; max-width: 500px; border-radius: 5px; border: none; }
+        button { padding: 10px 20px; background: #ff4444; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+        #drama-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+        .drama-card { background: #1f1f1f; border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+        .drama-card:hover { transform: scale(1.05); }
+        .drama-card img { width: 100%; height: 300px; object-fit: cover; }
+        .drama-info { padding: 10px; text-align: center; }
+        .drama-info h3 { margin: 10px 0 5px; font-size: 16px; }
+        .drama-info p { margin: 5px 0; font-size: 14px; color: #aaa; }
+        #detail-page { display: none; padding: 20px; }
+        #episode-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 20px; }
+        .episode-btn { background: #333; padding: 15px; text-align: center; border-radius: 5px; cursor: pointer; }
+        .episode-btn:hover { background: #ff4444; }
+        #player { width: 100%; max-width: 800px; margin: 20px auto; }
+        video { width: 100%; height: auto; background: #000; }
+        .back-btn { background: #333; padding: 10px 20px; cursor: pointer; display: inline-block; margin-bottom: 20px; border-radius: 5px; }
+        .loading { text-align: center; padding: 20px; }
+        footer { text-align: center; padding: 20px; background: #1f1f1f; font-size: 12px; color: #aaa; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-dark sticky-top px-3 mb-4">
-    <div class="container-fluid">
-        <span class="navbar-brand fw-bold text-danger">DRAMABOX</span>
-        <div class="d-flex gap-2">
-            <input type="text" id="searchInput" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Cari Judul...">
-            <button class="btn btn-sm btn-danger" onclick="cariDrama()">Cari</button>
+    <header>
+        <h1>DramaBox Nonton Sederhana</h1>
+        <p>Unofficial - Gunakan API dari https://dramabox-asia.vercel.app</p>
+    </header>
+
+    <div id="home-page">
+        <div id="search-bar">
+            <input type="text" id="search-input" placeholder="Cari judul drama (misal: CEO)">
+            <button onclick="searchDrama()">Cari</button>
+            <button onclick="loadTrending()" style="margin-left:10px;">Trending</button>
+            <button onclick="loadLatest(1)" style="margin-left:10px;">Terbaru</button>
         </div>
+
+        <div id="drama-list" class="loading">Loading drama populer...</div>
     </div>
-</nav>
 
-<div class="container pb-5">
-    <h5 class="mb-3 border-start border-4 border-danger ps-2" id="section-title">Baru Ditambahkan</h5>
-    
-    <div id="drama-list" class="row g-3">
-        <div class="text-center py-5">Memuat data...</div>
+    <div id="detail-page">
+        <div class="back-btn" onclick="backToHome()">← Kembali</div>
+        <div id="drama-detail"></div>
+        <h2>Episode</h2>
+        <div id="episode-list"></div>
+        <div id="player"></div>
     </div>
-</div>
 
-<div id="player-overlay">
-    <div class="close-btn" onclick="tutupPlayer()">&times;</div>
-    <div class="text-white mb-2" id="player-title">Memuat Video...</div>
-    <video id="videoPlayer" controls></video>
-    <div class="mt-3">
-        <button class="btn btn-outline-light btn-sm" onclick="gantiEps(-1)">Eps Sebelumnya</button>
-        <span id="current-eps" class="mx-3 text-white">Eps 1</span>
-        <button class="btn btn-outline-light btn-sm" onclick="gantiEps(1)">Eps Selanjutnya</button>
-    </div>
-</div>
+    <footer>
+        Ini adalah website sederhana unofficial untuk nonton short drama dari DramaBox menggunakan API publik.<br>
+        Tidak menyimpan video apa pun. Semua konten dari sumber eksternal.<br>
+        Dibuat untuk keperluan pribadi/eksperimen.
+    </footer>
 
-<script>
-    // --- KONFIGURASI PENTING ---
-    // Ganti dengan URL Vercel API milik Anda sendiri agar tidak kena Error CORS
-    // Contoh: 'https://api-saya.vercel.app'
-    // Jika link di screenshot adalah punya Anda, pakai itu.
-    // Kita tambahkan 'https://corsproxy.io/?' di depannya sebagai perantara
-// Menggunakan ThingProxy (biasanya lebih stabil dari corsproxy)
-const API_BASE = 'https://thingproxy.freeboard.io/fetch/https://dramabox-asia.vercel.app';
-    ccoconcoconstt dr = document.getElementById('drama-list');
-    const playerOverlay = document.getElementById('player-overlay');
-    const videoElem = document.getElementById('videoPlayer');
-    
-    let currentBookId = '';
-    let currentEpisode = 1;
+    <script>
+        const API_BASE = 'https://dramabox-asia.vercel.app/api';
 
-    // 1. Auto Load saat web dibuka (Pakai endpoint /latest sesuai screenshot)
-    window.onload = async () => {
-        try {
-            // Mengambil page 1 dari endpoint latest
-            const res = await fetch(`${API_BASE}/api/latest?page=1`);
-            const json = await res.json();
-            renderDrama(json.data); // Sesuai struktur JSON: { status, data: [...] }
-        } catch (e) {
-            dramaList.innerHTML = `<div class="text-danger text-center">Gagal memuat: ${e.message} (Cek URL API)</div>`;
-        }
-    };
-
-    // 2. Fungsi Cari Drama
-    async function cariDrama() {
-        const query = document.getElementById('searchInput').value;
-        if(!query) return;
-        
-        document.getElementById('section-title').innerText = `Hasil Cari: "${query}"`;
-        dramaList.innerHTML = '<div class="text-center w-100">Mencari...</div>';
-
-        try {
-            const res = await fetch(`${API_BASE}/api/search?q=${query}`);
-            const json = await res.json();
-            // Biasanya search return array langsung atau di dalam property result
-            const hasil = json.data || json.result || json; 
-            renderDrama(hasil);
-        } catch (e) {
-            dramaList.innerHTML = `<div class="text-danger text-center">Error: ${e.message}</div>`;
-        }
-    }
-
-    // 3. Menampilkan Kartu Drama (Sesuai JSON Screenshot Anda)
-    function renderDrama(items) {
-        dramaList.innerHTML = '';
-        if(!items || items.length === 0) {
-            dramaList.innerHTML = '<div class="text-center text-muted">Tidak ada data.</div>';
-            return;
+        function backToHome() {
+            document.getElementById('home-page').style.display = 'block';
+            document.getElementById('detail-page').style.display = 'none';
+            document.getElementById('player').innerHTML = '';
         }
 
-        items.forEach(item => {
-            // Mapping Data sesuai JSON Screenshot:
-            // bookId, judul, cover, total_episode
-            dramaList.innerHTML += `
-                <div class="col-6 col-md-3 col-lg-2">
-                    <div class="card h-100" onclick="bukaPlayer('${item.bookId}', '${item.judul}')">
-                        <span class="eps-badge">${item.total_episode || 'Ongoing'}</span>
-                        <img src="${item.cover}" class="card-img-top" alt="${item.judul}" onerror="this.src='https://via.placeholder.com/300x400'">
-                        <div class="card-body p-2">
-                            <p class="card-title text-truncate">${item.judul}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-    }
+        function loadTrending() {
+            document.getElementById('drama-list').innerHTML = '<div class="loading">Loading trending...</div>';
+            fetch(`${API_BASE}/trending`)
+                .then(res => res.json())
+                .then(data => displayDramas(data.data || []))
+                .catch(err => alert('Error loading trending: ' + err));
+        }
 
-    // 4. Buka Player & Ambil Stream
-    async function bukaPlayer(bookId, title) {
-        currentBookId = bookId;
-        currentEpisode = 1; // Reset ke eps 1
-        
-        playerOverlay.style.display = 'flex';
-        document.getElementById('player-title').innerText = title;
-        loadStream();
-    }
+        function loadLatest(page = 1) {
+            document.getElementById('drama-list').innerHTML = '<div class="loading">Loading terbaru...</div>';
+            fetch(`${API_BASE}/latest?page=${page}`)
+                .then(res => res.json())
+                .then(data => displayDramas(data.data || []))
+                .catch(err => alert('Error: ' + err));
+        }
 
-    async function loadStream() {
-        const titleElem = document.getElementById('player-title');
-        document.getElementById('current-eps').innerText = `Eps ${currentEpisode}`;
-        
-        try {
-            // Panggil endpoint /api/stream sesuai screenshot
-            // Parameter: bookId dan episode
-            const res = await fetch(`${API_BASE}/api/stream?bookId=${currentBookId}&episode=${currentEpisode}`);
-            const json = await res.json();
-            
-            // Asumsi response JSON stream ada di property 'url' atau 'streamUrl'
-            // Sesuaikan jika output JSON stream berbeda
-            const streamUrl = json.url || json.streamUrl || json.data?.url;
+        function searchDrama() {
+            const q = document.getElementById('search-input').value.trim();
+            if (!q) return alert('Masukkan kata kunci!');
+            document.getElementById('drama-list').innerHTML = '<div class="loading">Mencari...</div>';
+            fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}`)
+                .then(res => res.json())
+                .then(data => displayDramas(data.data || []))
+                .catch(err => alert('Error search: ' + err));
+        }
 
-            if(streamUrl) {
-                playHls(streamUrl);
-            } else {
-                alert("Stream tidak ditemukan untuk episode ini.");
+        function displayDramas(dramas) {
+            if (dramas.length === 0) {
+                document.getElementById('drama-list').innerHTML = '<p>Tidak ditemukan drama.</p>';
+                return;
             }
-        } catch (e) {
-            console.error(e);
-            alert("Gagal memuat stream.");
-        }
-    }
-
-    function playHls(src) {
-        if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(src);
-            hls.attachMedia(videoElem);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                videoElem.play();
+            let html = '';
+            dramas.forEach(drama => {
+                const cover = drama.cover || 'https://via.placeholder.com/240x400?text=No+Cover';
+                html += `
+                    <div class="drama-card" onclick="showDetail('${drama.bookId}')">
+                        <img src="${cover}" alt="${drama.judul}">
+                        <div class="drama-info">
+                            <h3>${drama.judul || 'Unknown'}</h3>
+                            <p>${drama.total_episode || '?? ep'}</p>
+                        </div>
+                    </div>`;
             });
-        } else if (videoElem.canPlayType('application/vnd.apple.mpegurl')) {
-            videoElem.src = src;
-            videoElem.play();
+            document.getElementById('drama-list').innerHTML = html;
         }
-    }
 
-    function gantiEps(num) {
-        const nextEps = currentEpisode + num;
-        if(nextEps < 1) return;
-        currentEpisode = nextEps;
-        loadStream();
-    }
+        function showDetail(bookId) {
+            fetch(`${API_BASE}/detail?bookId=${bookId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const drama = data.data || {};
+                    let detailHtml = `
+                        <h2>${drama.judul || 'Unknown'}</h2>
+                        <img src="${drama.cover || ''}" style="max-width:300px; border-radius:10px;">
+                        <p><strong>Total Episode:</strong> ${drama.total_episode || '??'}</p>
+                        <p>${drama.description || 'Tidak ada deskripsi.'}</p>`;
+                    document.getElementById('drama-detail').innerHTML = detailHtml;
 
-    function tutupPlayer() {
-        videoElem.pause();
-        videoElem.src = "";
-        playerOverlay.style.display = 'none';
-    }
-</script>
+                    // Buat list episode (asumsi total_episode seperti "50 ep")
+                    const totalEp = parseInt(drama.total_episode) || 50;
+                    let epHtml = '';
+                    for (let i = 1; i <= totalEp; i++) {
+                        epHtml += `<div class="episode-btn" onclick="playEpisode('${bookId}', ${i})">Episode ${i}</div>`;
+                    }
+                    document.getElementById('episode-list').innerHTML = epHtml;
+
+                    document.getElementById('home-page').style.display = 'none';
+                    document.getElementById('detail-page').style.display = 'block';
+                })
+                .catch(err => alert('Error detail: ' + err));
+        }
+
+        function playEpisode(bookId, episode) {
+            document.getElementById('player').innerHTML = '<div class="loading">Loading video...</div>';
+            fetch(`${API_BASE}/stream?bookId=${bookId}&episode=${episode}`)
+                .then(res => res.json())
+                .then(data => {
+                    const videoUrl = data.video_url || data.stream_url || data.url; // Sesuaikan berdasarkan response actual
+                    if (!videoUrl) {
+                        document.getElementById('player').innerHTML = '<p>Video tidak tersedia atau error.</p>';
+                        return;
+                    }
+                    const playerHtml = `
+                        <h3>Sedang memutar Episode ${episode}</h3>
+                        <video controls autoplay>
+                            <source src="${videoUrl}" type="video/mp4">
+                            Browser Anda tidak support video.
+                        </video>`;
+                    document.getElementById('player').innerHTML = playerHtml;
+                })
+                .catch(err => {
+                    document.getElementById('player').innerHTML = '<p>Error loading stream: ' + err + '</p>';
+                });
+        }
+
+        // Load trending saat pertama buka
+        window.onload = loadTrending;
+    </script>
 
 </body>
 </html>
