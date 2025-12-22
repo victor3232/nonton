@@ -7,66 +7,69 @@
     <style>
         body { font-family: Arial, sans-serif; background: #121212; color: #fff; margin: 0; padding: 0; }
         header { background: #1f1f1f; padding: 20px; text-align: center; }
-        h1 { margin: 0; }
-        #search-bar { padding: 20px; text-align: center; }
-        input[type="text"] { padding: 10px; width: 70%; max-width: 400px; border-radius: 5px 0 0 5px; border: none; }
-        button { padding: 10px 20px; background: #ff4444; color: #fff; border: none; cursor: pointer; }
-        #search-btn { border-radius: 0 5px 5px 0; }
-        #trending-btn, #latest-btn { border-radius: 5px; margin-left: 10px; }
+        h1 { margin: 0; font-size: 28px; }
+        header p { margin: 10px 0 0; font-size: 14px; color: #aaa; }
+        #search-bar { padding: 20px; text-align: center; background: #1a1a1a; }
+        #search-input { padding: 12px; width: 70%; max-width: 400px; border-radius: 8px 0 0 8px; border: none; font-size: 16px; }
+        button { padding: 12px 20px; background: #ff4444; color: #fff; border: none; cursor: pointer; font-size: 16px; }
+        #search-btn { border-radius: 0 8px 8px 0; }
+        #trending-btn, #latest-btn { border-radius: 8px; margin-left: 10px; }
         #drama-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px; }
-        .drama-card { background: #1f1f1f; border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+        .drama-card { background: #1f1f1f; border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
         .drama-card:hover { transform: scale(1.05); }
         .drama-card img { width: 100%; height: 280px; object-fit: cover; }
-        .drama-info { padding: 10px; text-align: center; }
-        .drama-info h3 { margin: 5px 0; font-size: 15px; }
-        .drama-info p { margin: 5px 0; font-size: 13px; color: #aaa; }
+        .drama-info { padding: 12px; text-align: center; }
+        .drama-info h3 { margin: 8px 0; font-size: 16px; }
+        .drama-info p { margin: 5px 0; font-size: 14px; color: #ccc; }
         #detail-page { display: none; padding: 20px; }
-        #episode-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
-        .episode-btn { background: #333; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        #drama-detail { text-align: center; margin-bottom: 30px; }
+        #drama-detail img { max-width: 300px; border-radius: 12px; margin: 15px 0; }
+        #episode-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; margin-top: 20px; }
+        .episode-btn { background: #333; padding: 16px; text-align: center; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
         .episode-btn:hover { background: #ff4444; }
-        .episode-btn.playing { background: #ff4444; }
+        .episode-btn.playing { background: #ff4444; font-weight: bold; }
         #player { width: 100%; max-width: 900px; margin: 30px auto; text-align: center; }
-        video { width: 100%; max-height: 80vh; background: #000; border-radius: 10px; }
-        .back-btn { background: #333; padding: 10px 20px; cursor: pointer; display: inline-block; margin-bottom: 20px; border-radius: 5px; }
-        .loading { text-align: center; padding: 40px; font-size: 18px; }
-        footer { text-align: center; padding: 20px; background: #1f1f1f; font-size: 12px; color: #aaa; }
+        video { width: 100%; max-height: 80vh; background: #000; border-radius: 12px; }
+        .back-btn { background: #333; padding: 12px 24px; cursor: pointer; display: inline-block; margin-bottom: 20px; border-radius: 8px; font-size: 16px; }
+        .loading { text-align: center; padding: 50px; font-size: 18px; color: #aaa; }
+        footer { text-align: center; padding: 30px; background: #1f1f1f; font-size: 13px; color: #777; margin-top: 50px; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>DramaBox Nonton Sederhana</h1>
-        <p>Unofficial - API dari https://dramabox-asia.vercel.app</p>
+        <p>Unofficial • Streaming Short Drama Gratis • API dari dramabox-asia.vercel.app</p>
     </header>
 
     <div id="home-page">
         <div id="search-bar">
-            <input type="text" id="search-input" placeholder="Cari judul drama (misal: CEO)">
+            <input type="text" id="search-input" placeholder="Cari judul drama (contoh: CEO, cinta)">
             <button id="search-btn" onclick="searchDrama()">Cari</button>
             <button id="trending-btn" onclick="loadTrending()">Trending</button>
             <button id="latest-btn" onclick="loadLatest(1)">Terbaru</button>
         </div>
 
-        <div id="drama-list" class="loading">Loading...</div>
+        <div id="drama-list" class="loading">Loading drama...</div>
     </div>
 
     <div id="detail-page">
         <div class="back-btn" onclick="backToHome()">← Kembali</div>
-        <div id="drama-detail" style="text-align:center;"></div>
-        <h2 style="text-align:center;">Episode</h2>
+        <div id="drama-detail"></div>
+        <h2 style="text-align:center; margin:30px 0 10px;">Daftar Episode</h2>
         <div id="episode-list" class="loading">Loading episode...</div>
         <div id="player"></div>
     </div>
 
     <footer>
-        Website sederhana unofficial untuk nonton short drama DramaBox.<br>
-        Tidak menyimpan video. Semua dari sumber eksternal. Untuk pribadi saja.
+        Website sederhana unofficial untuk nonton short drama dari DramaBox.<br>
+        Tidak menyimpan video apa pun — semua streaming langsung dari sumber resmi.<br>
+        Dibuat untuk keperluan pribadi & eksperimen. Gunakan dengan bijak.
     </footer>
 
     <script>
-        // Gunakan proxy untuk bypass CORS
-        const PROXY = 'https://api.allorigins.win/raw?url=';
-        const API_BASE = PROXY + 'https://dramabox-asia.vercel.app/api';
+        // API utama (work untuk list, detail, dan stream m3u8/mp4 signed)
+        const API_BASE = 'https://dramabox-asia.vercel.app/api';
 
         function backToHome() {
             document.getElementById('home-page').style.display = 'block';
@@ -80,7 +83,7 @@
                 .then(res => res.json())
                 .then(data => displayDramas(data.data || []))
                 .catch(err => {
-                    document.getElementById('drama-list').innerHTML = '<p>Error: ' + err + ' (Cek koneksi/proxy)</p>';
+                    document.getElementById('drama-list').innerHTML = `<p>Error load trending: ${err}. Coba refresh.</p>`;
                 });
         }
 
@@ -89,22 +92,22 @@
             fetch(`${API_BASE}/latest?page=${page}`)
                 .then(res => res.json())
                 .then(data => displayDramas(data.data || []))
-                .catch(err => document.getElementById('drama-list').innerHTML = '<p>Error: ' + err + '</p>');
+                .catch(err => document.getElementById('drama-list').innerHTML = `<p>Error: ${err}</p>`);
         }
 
         function searchDrama() {
             const q = document.getElementById('search-input').value.trim();
-            if (!q) return alert('Masukkan kata kunci!');
+            if (!q) return alert('Masukkan kata kunci pencarian!');
             document.getElementById('drama-list').innerHTML = '<div class="loading">Mencari...</div>';
             fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}`)
                 .then(res => res.json())
                 .then(data => displayDramas(data.data || []))
-                .catch(err => document.getElementById('drama-list').innerHTML = '<p>Error: ' + err + '</p>');
+                .catch(err => document.getElementById('drama-list').innerHTML = `<p>Error pencarian: ${err}</p>`);
         }
 
         function displayDramas(dramas) {
             if (dramas.length === 0) {
-                document.getElementById('drama-list').innerHTML = '<p>Tidak ditemukan drama.</p>';
+                document.getElementById('drama-list').innerHTML = '<p>Tidak ada drama ditemukan.</p>';
                 return;
             }
             let html = '';
@@ -115,7 +118,7 @@
                         <img src="${cover}" alt="${drama.judul}" loading="lazy">
                         <div class="drama-info">
                             <h3>${drama.judul || 'Unknown'}</h3>
-                            <p>${drama.total_episode || '?? Ep'}</p>
+                            <p>${drama.total_episode || '?? Episode'}</p>
                         </div>
                     </div>`;
             });
@@ -125,74 +128,94 @@
         async function showDetail(bookId) {
             try {
                 const res = await fetch(`${API_BASE}/detail?bookId=${bookId}`);
-                const data = await res.json();
-                const drama = data; // response langsung object, bukan data.data
+                const json = await res.json();
+                const drama = json.data || json;
 
                 let detailHtml = `
                     <h2>${drama.judul || 'Unknown'}</h2>
-                    <img src="${drama.cover || ''}" style="max-width:300px; border-radius:10px; margin:10px 0;">
+                    <img src="${drama.cover || ''}" alt="${drama.judul}">
                     <p><strong>Total Episode:</strong> ${drama.total_episode || '??'}</p>
                     <p>${drama.deskripsi || 'Tidak ada deskripsi.'}</p>`;
                 document.getElementById('drama-detail').innerHTML = detailHtml;
 
-                // Gunakan episodes array dari API detail
-                const episodes = drama.episodes || [];
+                // Buat list episode (manual berdasarkan total_episode)
+                const totalEp = parseInt(drama.total_episode.replace(/\D/g,'')) || 50;
                 let epHtml = '';
-                episodes.forEach(ep => {
-                    const epNum = parseInt(ep.episode_label);
-                    epHtml += `<div class="episode-btn" onclick="playEpisode('${bookId}', ${epNum})">Episode ${epNum}</div>`;
-                });
-                if (episodes.length === 0) epHtml = '<p>Tidak ada data episode.</p>';
+                for (let i = 1; i <= totalEp; i++) {
+                    epHtml += `<div class="episode-btn" onclick="playEpisode('${bookId}', ${i})">Episode ${i}</div>`;
+                }
                 document.getElementById('episode-list').innerHTML = epHtml;
 
+                // Pindah ke halaman detail
                 document.getElementById('home-page').style.display = 'none';
                 document.getElementById('detail-page').style.display = 'block';
 
-                // Auto play episode 1
-                if (episodes.length > 0) playEpisode(bookId, 1);
+                // Auto play Episode 1
+                playEpisode(bookId, 1);
             } catch (err) {
-                alert('Error load detail: ' + err);
+                alert('Gagal load detail drama: ' + err);
             }
         }
 
         async function playEpisode(bookId, episode) {
-            // Highlight episode yang diputar
-            document.querySelectorAll('.episode-btn').forEach(btn => {
-                btn.classList.remove('playing');
-                if (btn.textContent.includes(`Episode ${episode}`)) btn.classList.add('playing');
-            });
+            // Highlight episode aktif
+            document.querySelectorAll('.episode-btn').forEach(btn => btn.classList.remove('playing'));
+            const buttons = document.querySelectorAll('.episode-btn');
+            if (buttons[episode - 1]) buttons[episode - 1].classList.add('playing');
 
-            document.getElementById('player').innerHTML = '<div class="loading">Loading video Episode ' + episode + '...</div>';
+            document.getElementById('player').innerHTML = '<div class="loading">Mengambil link video Episode ' + episode + '...</div>';
 
-            // Bangun URL m3u8 langsung (API stream sering error 400, ini bypass)
-            const videoUrl = `https://videoplayback.dramaboxdb.com/${bookId}/${episode}/index.m3u8`;
+            try {
+                const res = await fetch(`${API_BASE}/stream?bookId=${bookId}&episode=${episode}`);
+                if (!res.ok) throw 'Server error atau rate limit';
+                const json = await res.json();
 
-            const playerHtml = `
-                <h3>Sedang memutar: Episode ${episode}</h3>
-                <video id="video-player" controls autoplay playsinline>
-                    <source src="${videoUrl}" type="application/x-mpegURL">
-                    Browser tidak support HLS. Coba browser lain (Chrome/Firefox).
-                </video>`;
+                if (json.status !== 'success') throw 'API response tidak success';
 
-            document.getElementById('player').innerHTML = playerHtml;
+                const videoData = json.data.chapter.video;
+                const m3u8Url = videoData.m3u8;
+                const mp4Url = videoData.mp4;
 
-            // Load HLS jika browser support
-            if (Hls.isSupported()) {
-                const video = document.getElementById('video-player');
-                const hls = new Hls();
-                hls.loadSource(videoUrl);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                const playerHtml = `
+                    <h3>Sedang memutar: Episode ${episode}</h3>
+                    <video id="video-player" controls autoplay playsinline>
+                        <source src="${m3u8Url}" type="application/x-mpegURL">
+                        <source src="${mp4Url}" type="video/mp4">
+                        Browser Anda tidak mendukung pemutaran video.
+                    </video>`;
+
+                document.getElementById('player').innerHTML = playerHtml;
+
+                // Support HLS dengan hls.js
+                if (Hls.isSupported()) {
+                    const video = document.getElementById('video-player');
+                    const hls = new Hls();
+                    hls.loadSource(m3u8Url);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                }
+                // Safari native HLS support
+                else if (document.getElementById('video-player').canPlayType('application/vnd.apple.mpegurl')) {
+                    document.getElementById('video-player').src = m3u8Url;
+                }
+
+            } catch (err) {
+                document.getElementById('player').innerHTML = `
+                    <p style="color:#ff8888;">Gagal memuat video Episode ${episode}<br>
+                    ${err}<br><br>
+                    Solusi: Coba episode lain atau refresh halaman dalam 5-10 menit (rate limit API gratis).</p>`;
             }
         }
 
-        // Load HLS.js untuk support m3u8 di browser
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
-        document.head.appendChild(script);
+        // Load library HLS.js untuk browser non-native
+        const hlsScript = document.createElement('script');
+        hlsScript.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
+        document.head.appendChild(hlsScript);
 
-        // Load trending saat buka
-        window.onload = loadTrending;
+        // Mulai dengan trending saat halaman dibuka
+        window.onload = () => {
+            loadTrending();
+        };
     </script>
 
 </body>
