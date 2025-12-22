@@ -62,8 +62,8 @@
     // Ganti dengan URL Vercel API milik Anda sendiri agar tidak kena Error CORS
     // Contoh: 'https://api-saya.vercel.app'
     // Jika link di screenshot adalah punya Anda, pakai itu.
-    const API_BASE = 'https://dramabox-asia.vercel.app'; 
-
+    // Kita tambahkan 'https://corsproxy.io/?' di depannya sebagai perantara
+const API_BASE = 'https://corsproxy.io/?https://dramabox-asia.vercel.app';
     const dramaList = document.getElementById('drama-list');
     const playerOverlay = document.getElementById('player-overlay');
     const videoElem = document.getElementById('videoPlayer');
