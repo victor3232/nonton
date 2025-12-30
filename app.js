@@ -38,7 +38,7 @@ function clearLoadingList() {
 // cek apakah home-page sedang aktif (buat infinite scroll)
 function isHomeVisible() {
     const home = document.getElementById('home-page');
-    return home && home.style.display !== 'none';
+    return !!home && home.style.display !== 'none';
 }
 
 
@@ -60,9 +60,13 @@ function setMode(mode, force = false) {
     if (mode === 'random') document.getElementById('random-btn')?.classList.add('active');
 
     // pastikan yang tampil home-page
-    document.getElementById('home-page').style.display = 'block';
-    document.getElementById('detail-page').style.display = 'none';
-    document.getElementById('player-page').style.display = 'none';
+    const homePage = document.getElementById('home-page');
+    const detailPage = document.getElementById('detail-page');
+    const playerPage = document.getElementById('player-page');
+
+    if (homePage) homePage.style.display = 'block';
+    if (detailPage) detailPage.style.display = 'none';
+    if (playerPage) playerPage.style.display = 'none';
 
     loadMore(true);
 }
@@ -120,8 +124,10 @@ async function loadTrending() {
         appendDramas(list, { tag: 'Trending' });
         currentPage++;
     } catch (err) {
-        document.getElementById('drama-list').innerHTML =
-            `<p style="padding:20px;">Error load trending: ${err}</p>`;
+        const list = document.getElementById('drama-list');
+        if (list) {
+            list.innerHTML = `<p style="padding:20px;">Error load trending: ${err}</p>`;
+        }
     }
 }
 
@@ -138,8 +144,10 @@ async function loadLatest() {
         appendDramas(list, { tag: 'Terbaru' });
         currentPage++;
     } catch (err) {
-        document.getElementById('drama-list').innerHTML =
-            `<p style="padding:20px;">Error load terbaru: ${err}</p>`;
+        const list = document.getElementById('drama-list');
+        if (list) {
+            list.innerHTML = `<p style="padding:20px;">Error load terbaru: ${err}</p>`;
+        }
     }
 }
 
@@ -152,15 +160,18 @@ async function loadRandom() {
         const list = (json.data && json.data.list) || [];
         appendDramas(list, { tag: 'Rekomendasi' });
     } catch (err) {
-        document.getElementById('drama-list').innerHTML =
-            `<p style="padding:20px;">Error load rekomendasi: ${err}</p>`;
+        const list = document.getElementById('drama-list');
+        if (list) {
+            list.innerHTML = `<p style="padding:20px;">Error load rekomendasi: ${err}</p>`;
+        }
     }
 }
 
 
 // ================== SEARCH ==================
 function searchDrama() {
-    const q = document.getElementById('search-input').value.trim();
+    const input = document.getElementById('search-input');
+    const q = input ? input.value.trim() : '';
     if (!q) {
         alert('Masukkan kata kunci pencarian!');
         return;
@@ -177,10 +188,13 @@ function searchDrama() {
     // hilangkan highlight tab (mode khusus search)
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
-    // pastikan yang tampil home-page
-    document.getElementById('home-page').style.display = 'block';
-    document.getElementById('detail-page').style.display = 'none';
-    document.getElementById('player-page').style.display = 'none';
+    const homePage = document.getElementById('home-page');
+    const detailPage = document.getElementById('detail-page');
+    const playerPage = document.getElementById('player-page');
+
+    if (homePage) homePage.style.display = 'block';
+    if (detailPage) detailPage.style.display = 'none';
+    if (playerPage) playerPage.style.display = 'none';
 
     loadMore(true);
 }
@@ -199,8 +213,10 @@ async function loadSearchPage() {
         appendDramas(list, { tag: 'Search' });
         currentPage++;
     } catch (err) {
-        document.getElementById('drama-list').innerHTML =
-            `<p style="padding:20px;">Error pencarian: ${err}</p>`;
+        const list = document.getElementById('drama-list');
+        if (list) {
+            list.innerHTML = `<p style="padding:20px;">Error pencarian: ${err}</p>`;
+        }
     }
 }
 
@@ -257,18 +273,27 @@ function appendDramas(dramas, options = {}) {
 
 // ================== NAVIGASI HALAMAN ==================
 function backToHome() {
-    document.getElementById('home-page').style.display = 'block';
-    document.getElementById('detail-page').style.display = 'none';
-    document.getElementById('player-page').style.display = 'none';
+    const homePage = document.getElementById('home-page');
+    const detailPage = document.getElementById('detail-page');
+    const playerPage = document.getElementById('player-page');
+
+    if (homePage) homePage.style.display = 'block';
+    if (detailPage) detailPage.style.display = 'none';
+    if (playerPage) playerPage.style.display = 'none';
 
     const video = document.getElementById('video-player');
     if (video) video.pause();
-    document.getElementById('player').innerHTML = '';
+
+    const player = document.getElementById('player');
+    if (player) player.innerHTML = '';
 }
 
 function backToDetail() {
-    document.getElementById('detail-page').style.display = 'block';
-    document.getElementById('player-page').style.display = 'none';
+    const detailPage = document.getElementById('detail-page');
+    const playerPage = document.getElementById('player-page');
+
+    if (detailPage) detailPage.style.display = 'block';
+    if (playerPage) playerPage.style.display = 'none';
 
     const video = document.getElementById('video-player');
     if (video) video.pause();
@@ -305,15 +330,19 @@ async function showDetail(index) {
             <p class="detail-description">${intro}</p>
         </div>
     `;
-    document.getElementById('drama-detail').innerHTML = detailHtml;
+    const detailEl = document.getElementById('drama-detail');
+    if (detailEl) detailEl.innerHTML = detailHtml;
 
-    document.getElementById('episode-list').innerHTML =
-        '<div class="loading">Loading episode...</div>';
+    const epList = document.getElementById('episode-list');
+    if (epList) epList.innerHTML = '<div class="loading">Loading episode...</div>';
 
-    // pindah ke halaman detail
-    document.getElementById('home-page').style.display = 'none';
-    document.getElementById('detail-page').style.display = 'block';
-    document.getElementById('player-page').style.display = 'none';
+    const homePage = document.getElementById('home-page');
+    const detailPage = document.getElementById('detail-page');
+    const playerPage = document.getElementById('player-page');
+
+    if (homePage) homePage.style.display = 'none';
+    if (detailPage) detailPage.style.display = 'block';
+    if (playerPage) playerPage.style.display = 'none';
 
     try {
         const res = await fetch(`${API_BASE}/chapters/${bookId}?lang=${LANG}`);
@@ -322,8 +351,9 @@ async function showDetail(index) {
         lastChapters = chapters;
 
         if (!chapters.length) {
-            document.getElementById('episode-list').innerHTML =
-                '<p style="padding:10px;">Tidak ada episode tersedia.</p>';
+            if (epList) {
+                epList.innerHTML = '<p style="padding:10px;">Tidak ada episode tersedia.</p>';
+            }
             return;
         }
 
@@ -339,41 +369,49 @@ async function showDetail(index) {
                     ${epNumber}
                 </button>`;
         });
-        document.getElementById('episode-list').innerHTML = epHtml;
+        if (epList) epList.innerHTML = epHtml;
 
-        // tidak auto play; user pilih episode sendiri
     } catch (err) {
-        document.getElementById('episode-list').innerHTML =
-            `<p style="padding:10px;">Gagal load episode: ${err}</p>`;
+        if (epList) {
+            epList.innerHTML = `<p style="padding:10px;">Gagal load episode: ${err}</p>`;
+        }
     }
 }
 
 
-// ================== PLAYER HALAMAN TERPISAH ==================
+// ================== PLAYER (kalau player-page belum ada, tetap main di #player biasa) ==================
 async function playEpisode(bookId, chapterIndex, buttonPosition) {
-    // highlight tombol episode di halaman detail
+    // highlight tombol episode
     document.querySelectorAll('.episode-btn').forEach(btn => btn.classList.remove('playing'));
     const buttons = document.querySelectorAll('.episode-btn');
     if (buttons[buttonPosition]) buttons[buttonPosition].classList.add('playing');
 
     const episodeNumber = chapterIndex + 1;
 
-    // pindah ke halaman player
-    document.getElementById('home-page').style.display = 'none';
-    document.getElementById('detail-page').style.display = 'none';
-    document.getElementById('player-page').style.display = 'block';
+    const homePage = document.getElementById('home-page');
+    const detailPage = document.getElementById('detail-page');
+    const playerPage = document.getElementById('player-page');
 
-    // header info di halaman player
-    const meta = document.getElementById('player-meta');
-    if (meta) {
-        meta.innerHTML = `
-            <div class="player-meta-ep">Episode ${episodeNumber} / ${currentDramaTotalEp || ''}</div>
-            <div class="player-meta-title">${currentDramaTitle || ''}</div>
-        `;
+    // kalau ada player-page, pakai halaman itu. kalau tidak, tetap di detail-page.
+    if (playerPage) {
+        if (homePage) homePage.style.display = 'none';
+        if (detailPage) detailPage.style.display = 'none';
+        playerPage.style.display = 'block';
+
+        const meta = document.getElementById('player-meta');
+        if (meta) {
+            meta.innerHTML = `
+                <div class="player-meta-ep">Episode ${episodeNumber} / ${currentDramaTotalEp || ''}</div>
+                <div class="player-meta-title">${currentDramaTitle || ''}</div>
+            `;
+        }
     }
 
-    document.getElementById('player').innerHTML =
-        `<div class="loading">Mengambil link video Episode ${episodeNumber}...</div>`;
+    const player = document.getElementById('player');
+    if (player) {
+        player.innerHTML =
+            `<div class="loading">Mengambil link video Episode ${episodeNumber}...</div>`;
+    }
 
     try {
         const res = await fetch(
@@ -397,22 +435,23 @@ async function playEpisode(bookId, chapterIndex, buttonPosition) {
                 Browser Anda tidak mendukung pemutaran video.
             </video>
         `;
-        document.getElementById('player').innerHTML = playerHtml;
+        if (player) player.innerHTML = playerHtml;
     } catch (err) {
-        document.getElementById('player').innerHTML = `
-            <p style="color:#ff8888;padding:10px;">
-                Gagal memuat video Episode ${episodeNumber}<br>
-                ${err}<br><br>
-                Solusi: Coba episode lain atau refresh halaman (API gratis bisa kena rate limit).
-            </p>`;
+        if (player) {
+            player.innerHTML = `
+                <p style="color:#ff8888;padding:10px;">
+                    Gagal memuat video Episode ${episodeNumber}<br>
+                    ${err}<br><br>
+                    Solusi: Coba episode lain atau refresh halaman (API gratis bisa kena rate limit).
+                </p>`;
+        }
     }
 }
 
 
 // ================== INIT + INFINITE SCROLL ==================
 window.onload = () => {
-    // mulai dari trending
-    setMode('trending', true);
+    setMode('trending', true);   // mulai dari trending
 };
 
 // infinite scroll hanya saat home-page kelihatan
@@ -425,4 +464,4 @@ window.addEventListener('scroll', () => {
     if (scrollPosition >= threshold) {
         loadMore();
     }
-});
+}); 
