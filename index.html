@@ -44,10 +44,10 @@
                 🔥 Trending
             </button>
             <button id="latest-btn" class="tab-btn" onclick="setMode('latest')">
-                🌟 Terbaru
+                🆕 Terbaru
             </button>
             <button id="random-btn" class="tab-btn" onclick="setMode('random')">
-                ⚡ Rekomendasi
+                🎲 Rekomendasi
             </button>
         </div>
 
@@ -62,7 +62,7 @@
         <!-- List drama -->
         <div id="drama-list" class="loading">Loading drama...</div>
 
-        <!-- Tombol load more (disembunyikan, dipakai oleh JS / infinite scroll) -->
+        <!-- Tombol load more (disembunyikan via CSS) -->
         <div class="load-more-wrapper">
             <button id="load-more-btn" class="load-more-btn" onclick="loadMore()">
                 Selanjutnya
@@ -70,29 +70,26 @@
         </div>
     </section>
 
-    <!-- DETAIL -->
+    <!-- DETAIL DRAMA (INFO + EPISODE SAJA) -->
     <section id="detail-page">
         <div class="detail-header">
-            <button class="back-btn" onclick="backToHome()">← Kembali</button>
+            <button class="back-btn" onclick="backToHome()">← Beranda</button>
         </div>
 
         <div id="drama-detail"></div>
 
-        <!-- VIDEO DI ATAS -->
-        <div id="player"></div>
-
-        <!-- EPISODE DI BAWAH -->
-        <h2 class="section-title">Daftar Episode</h2>
+        <h2 class="section-title">Episode</h2>
         <div id="episode-list" class="loading">Loading episode...</div>
     </section>
+
+    <!-- PLAYER PAGE (VIDEO TERPISAH) -->
+    <section id="player-page">
+        <div class="detail-header">
+            <button class="back-btn" onclick="backToDetail()">← Episode</button>
+        </div>
+
+        <div id="player-meta" class="player-meta"></div>
+
+        <div id="player"></div>
+    </section>
 </main>
-
-<footer>
-    Website sederhana unofficial untuk nonton short drama dari DramaBox.<br>
-    Tidak menyimpan video apa pun — semua streaming langsung dari sumber resmi.<br>
-    Dibuat untuk keperluan pribadi & eksperimen. Gunakan dengan bijak.
-</footer>
-
-<script src="app.js" defer></script>
-</body>
-</html>
