@@ -189,10 +189,9 @@ button {
 
 /* LOAD MORE */
 
+/* Tombol disembunyikan karena sekarang pakai infinite scroll */
 .load-more-wrapper {
-    margin: 16px 0 4px;
-    display: flex;
-    justify-content: center;
+    display: none;
 }
 
 .load-more-btn {
