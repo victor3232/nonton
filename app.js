@@ -288,7 +288,7 @@ async function showDetail(index) {
             const isVip = ch.isCharge === 1;
             epHtml += `
                 <div class="episode-btn" onclick="playEpisode('${bookId}', ${ch.chapterIndex}, ${i})">
-                    Eps ${epNumber}${isVip ? ' 🔒' : ''}
+                    Eps ${epNumber}${isVip ? '' : ''}
                 </div>`;
         });
         document.getElementById('episode-list').innerHTML = epHtml;
