@@ -7,54 +7,73 @@ let currentMode = 'trending';   // 'trending' | 'latest' | 'random' | 'search'
 let currentPage = 1;
 let currentSearch = '';
 
-let maxPageTrending = 5;        // boleh dinaikkan
+let maxPageTrending = 5;
 let maxPageLatest = 10;
 let maxPageSearch = 5;
 
-let currentDramas = [];         // daftar drama yang sedang ditampilkan
-let lastChapters = [];          // chapter list untuk detail
+let currentDramas = [];         // list drama yang tampil di beranda
+let lastChapters = [];          // cache daftar episode drama aktif
 
-let isLoading = false;          // mencegah loadMore dipanggil berkali-kali
+let isLoading = false;          // mencegah loadMore dobel
+
+// info untuk halaman player
+let currentDramaTitle = '';
+let currentDramaTotalEp = '';
+
 
 // ================== UTIL ==================
 function setLoadingList(text) {
     const list = document.getElementById('drama-list');
+    if (!list) return;
     list.classList.add('loading');
     list.innerHTML = text;
 }
 
 function clearLoadingList() {
     const list = document.getElementById('drama-list');
+    if (!list) return;
     list.classList.remove('loading');
 }
 
+// cek apakah home-page sedang aktif (buat infinite scroll)
+function isHomeVisible() {
+    const home = document.getElementById('home-page');
+    return home && home.style.display !== 'none';
+}
+
+
 // ================== MODE (TAB) ==================
 function setMode(mode, force = false) {
-    // kalau mode sama dan tidak dipaksa, tidak perlu reload
     if (currentMode === mode && !force) return;
 
     currentMode = mode;
     currentPage = 1;
     currentDramas = [];
-    document.getElementById('drama-list').innerHTML = '';
+
+    const list = document.getElementById('drama-list');
+    if (list) list.innerHTML = '';
 
     // reset highlight tab
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    if (mode === 'trending') document.getElementById('trending-btn').classList.add('active');
-    if (mode === 'latest') document.getElementById('latest-btn').classList.add('active');
-    if (mode === 'random') document.getElementById('random-btn').classList.add('active');
+    if (mode === 'trending') document.getElementById('trending-btn')?.classList.add('active');
+    if (mode === 'latest') document.getElementById('latest-btn')?.classList.add('active');
+    if (mode === 'random') document.getElementById('random-btn')?.classList.add('active');
 
-    // mulai load data mode baru
+    // pastikan yang tampil home-page
+    document.getElementById('home-page').style.display = 'block';
+    document.getElementById('detail-page').style.display = 'none';
+    document.getElementById('player-page').style.display = 'none';
+
     loadMore(true);
 }
 
-// ================== LOAD MORE (DIPAKAI INFINITE SCROLL) ==================
+
+// ================== LOAD MORE (buat infinite scroll) ==================
 function loadMore(reset = false) {
-    // kalau lagi loading dan ini bukan reset pertama → jangan jalan
     if (isLoading && !reset) return;
     isLoading = true;
 
-    const btn = document.getElementById('load-more-btn'); // tombol disembunyikan di CSS, tapi tetap dicek
+    const btn = document.getElementById('load-more-btn'); // hidden di CSS tapi tetap dipakai
     if (btn) {
         btn.disabled = true;
         btn.textContent = 'Memuat selanjutnya...';
@@ -80,18 +99,20 @@ function loadMore(reset = false) {
         loadRandom().finally(finish);
     } else if (currentMode === 'search') {
         loadSearchPage().finally(finish);
+    } else {
+        finish();
     }
 }
 
-// ================== LIST DRAMA: TRENDING / TERBARU / RANDOM / SEARCH ==================
 
-// Trending = /rank/{page}
+// ================== LOAD LIST DRAMA ==================
+
+// Trending: /rank/{page}
 async function loadTrending() {
     if (currentPage > maxPageTrending) {
         clearLoadingList();
         return;
     }
-
     try {
         const res = await fetch(`${API_BASE}/rank/${currentPage}?lang=${LANG}`);
         const json = await res.json();
@@ -104,13 +125,12 @@ async function loadTrending() {
     }
 }
 
-// Terbaru = /new/{page}
+// Terbaru: /new/{page}
 async function loadLatest() {
     if (currentPage > maxPageLatest) {
         clearLoadingList();
         return;
     }
-
     try {
         const res = await fetch(`${API_BASE}/new/${currentPage}?lang=${LANG}&pageSize=20`);
         const json = await res.json();
@@ -123,7 +143,7 @@ async function loadLatest() {
     }
 }
 
-// Random / rekomendasi (gunakan rank random page)
+// Random rekomendasi: pakai rank random page
 async function loadRandom() {
     try {
         const randomPage = Math.floor(Math.random() * 10) + 1;
@@ -137,30 +157,39 @@ async function loadRandom() {
     }
 }
 
-// Pencarian
+
+// ================== SEARCH ==================
 function searchDrama() {
     const q = document.getElementById('search-input').value.trim();
-    if (!q) return alert('Masukkan kata kunci pencarian!');
+    if (!q) {
+        alert('Masukkan kata kunci pencarian!');
+        return;
+    }
 
     currentMode = 'search';
     currentSearch = q;
     currentPage = 1;
     currentDramas = [];
-    document.getElementById('drama-list').innerHTML = '';
 
-    // hilangkan highlight tab (karena ini mode search)
+    const list = document.getElementById('drama-list');
+    if (list) list.innerHTML = '';
+
+    // hilangkan highlight tab (mode khusus search)
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+    // pastikan yang tampil home-page
+    document.getElementById('home-page').style.display = 'block';
+    document.getElementById('detail-page').style.display = 'none';
+    document.getElementById('player-page').style.display = 'none';
 
     loadMore(true);
 }
 
-// Load page pencarian berikutnya
 async function loadSearchPage() {
     if (currentPage > maxPageSearch) {
         clearLoadingList();
         return;
     }
-
     try {
         const res = await fetch(
             `${API_BASE}/search/${encodeURIComponent(currentSearch)}/${currentPage}?lang=${LANG}`
@@ -175,10 +204,12 @@ async function loadSearchPage() {
     }
 }
 
-// Tambahkan drama ke grid
+
+// ================== RENDER CARD DRAMA ==================
 function appendDramas(dramas, options = {}) {
     clearLoadingList();
     const listEl = document.getElementById('drama-list');
+    if (!listEl) return;
 
     if (!dramas || dramas.length === 0) {
         if (currentDramas.length === 0) {
@@ -190,9 +221,7 @@ function appendDramas(dramas, options = {}) {
     const startIndex = currentDramas.length;
     currentDramas = currentDramas.concat(dramas);
 
-    // =========================
-    // FIX: BERSIHKAN "Loading drama..."
-    // =========================
+    // bersihkan "Loading drama..." kalau masih ada di HTML lama
     let html = listEl.innerHTML.trim();
     if (html.includes('Loading drama')) {
         html = '';
@@ -225,14 +254,28 @@ function appendDramas(dramas, options = {}) {
     listEl.innerHTML = html;
 }
 
-// ================== DETAIL & EPISODE ==================
+
+// ================== NAVIGASI HALAMAN ==================
 function backToHome() {
     document.getElementById('home-page').style.display = 'block';
     document.getElementById('detail-page').style.display = 'none';
+    document.getElementById('player-page').style.display = 'none';
+
+    const video = document.getElementById('video-player');
+    if (video) video.pause();
     document.getElementById('player').innerHTML = '';
 }
 
-// Tampilkan detail drama dan ambil daftar episode
+function backToDetail() {
+    document.getElementById('detail-page').style.display = 'block';
+    document.getElementById('player-page').style.display = 'none';
+
+    const video = document.getElementById('video-player');
+    if (video) video.pause();
+}
+
+
+// ================== DETAIL DRAMA & EPISODE ==================
 async function showDetail(index) {
     const drama = currentDramas[index];
     if (!drama) {
@@ -245,6 +288,9 @@ async function showDetail(index) {
     const cover = drama.cover || '';
     const totalEpText = drama.chapterCount || drama.total_episode || '??';
     const intro = drama.introduction || drama.deskripsi || 'Tidak ada deskripsi.';
+
+    currentDramaTitle = title;
+    currentDramaTotalEp = totalEpText;
 
     const detailHtml = `
         <div>
@@ -263,10 +309,11 @@ async function showDetail(index) {
 
     document.getElementById('episode-list').innerHTML =
         '<div class="loading">Loading episode...</div>';
-    document.getElementById('player').innerHTML = '';
 
+    // pindah ke halaman detail
     document.getElementById('home-page').style.display = 'none';
     document.getElementById('detail-page').style.display = 'block';
+    document.getElementById('player-page').style.display = 'none';
 
     try {
         const res = await fetch(`${API_BASE}/chapters/${bookId}?lang=${LANG}`);
@@ -285,30 +332,46 @@ async function showDetail(index) {
             const epNumber = (typeof ch.chapterIndex === 'number')
                 ? ch.chapterIndex + 1
                 : (i + 1);
-            const isVip = ch.isCharge === 1;
+
+            // tombol episode = angka saja, tanpa icon gembok
             epHtml += `
-                <div class="episode-btn" onclick="playEpisode('${bookId}', ${ch.chapterIndex}, ${i})">
-                    Eps ${epNumber}${isVip ? '' : ''}
-                </div>`;
+                <button class="episode-btn" onclick="playEpisode('${bookId}', ${ch.chapterIndex}, ${i})">
+                    ${epNumber}
+                </button>`;
         });
         document.getElementById('episode-list').innerHTML = epHtml;
 
-        // auto play episode pertama
-        playEpisode(bookId, chapters[0].chapterIndex, 0);
+        // tidak auto play; user pilih episode sendiri
     } catch (err) {
         document.getElementById('episode-list').innerHTML =
             `<p style="padding:10px;">Gagal load episode: ${err}</p>`;
     }
 }
 
-// Play episode via endpoint watch
+
+// ================== PLAYER HALAMAN TERPISAH ==================
 async function playEpisode(bookId, chapterIndex, buttonPosition) {
-    // highlight episode aktif
+    // highlight tombol episode di halaman detail
     document.querySelectorAll('.episode-btn').forEach(btn => btn.classList.remove('playing'));
     const buttons = document.querySelectorAll('.episode-btn');
     if (buttons[buttonPosition]) buttons[buttonPosition].classList.add('playing');
 
     const episodeNumber = chapterIndex + 1;
+
+    // pindah ke halaman player
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('detail-page').style.display = 'none';
+    document.getElementById('player-page').style.display = 'block';
+
+    // header info di halaman player
+    const meta = document.getElementById('player-meta');
+    if (meta) {
+        meta.innerHTML = `
+            <div class="player-meta-ep">Episode ${episodeNumber} / ${currentDramaTotalEp || ''}</div>
+            <div class="player-meta-title">${currentDramaTitle || ''}</div>
+        `;
+    }
+
     document.getElementById('player').innerHTML =
         `<div class="loading">Mengambil link video Episode ${episodeNumber}...</div>`;
 
@@ -329,7 +392,6 @@ async function playEpisode(bookId, chapterIndex, buttonPosition) {
         if (!videoUrl) throw 'URL video tidak ditemukan';
 
         const playerHtml = `
-            <h3 style="margin-bottom:8px;font-size:15px;">Sedang memutar: Episode ${episodeNumber}</h3>
             <video id="video-player" controls autoplay playsinline>
                 <source src="${videoUrl}" type="video/mp4">
                 Browser Anda tidak mendukung pemutaran video.
@@ -346,17 +408,21 @@ async function playEpisode(bookId, chapterIndex, buttonPosition) {
     }
 }
 
-// ================== INIT & INFINITE SCROLL ==================
+
+// ================== INIT + INFINITE SCROLL ==================
 window.onload = () => {
-    setMode('trending', true); // load trending saat pertama dibuka
+    // mulai dari trending
+    setMode('trending', true);
 };
 
-// kalau posisi scroll mendekati bawah, otomatis loadMore()
+// infinite scroll hanya saat home-page kelihatan
 window.addEventListener('scroll', () => {
+    if (!isHomeVisible()) return;
+
     const scrollPosition = window.innerHeight + window.scrollY;
-    const threshold = document.body.offsetHeight - 400; // 400px dari bawah
+    const threshold = document.body.offsetHeight - 400;
 
     if (scrollPosition >= threshold) {
         loadMore();
     }
-}); 
+});
