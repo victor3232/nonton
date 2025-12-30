@@ -47,34 +47,36 @@ function setMode(mode, force = false) {
 
 // Dipanggil tombol "Muat Lagi"
 function loadMore(reset = false) {
+    // kalau lagi loading, jangan load lagi (kecuali reset pertama kali)
+    if (isLoading && !reset) return;
+    isLoading = true;
+
     const btn = document.getElementById('load-more-btn');
-    btn.disabled = true;
-    btn.textContent = 'Memuat...';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Memuat selanjutnya...';
+    }
 
     if (reset) {
         setLoadingList('<div class="loading">Loading drama...</div>');
     }
 
+    const finish = () => {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Selanjutnya';
+        }
+        isLoading = false;
+    };
+
     if (currentMode === 'trending') {
-        loadTrending().finally(() => {
-            btn.disabled = false;
-            btn.textContent = 'Muat Lagi';
-        });
+        loadTrending().finally(finish);
     } else if (currentMode === 'latest') {
-        loadLatest().finally(() => {
-            btn.disabled = false;
-            btn.textContent = 'Muat Lagi';
-        });
+        loadLatest().finally(finish);
     } else if (currentMode === 'random') {
-        loadRandom().finally(() => {
-            btn.disabled = false;
-            btn.textContent = 'Muat Lagi';
-        });
+        loadRandom().finally(finish);
     } else if (currentMode === 'search') {
-        loadSearchPage().finally(() => {
-            btn.disabled = false;
-            btn.textContent = 'Muat Lagi';
-        });
+        loadSearchPage().finally(finish);
     }
 }
 
@@ -337,3 +339,14 @@ async function playEpisode(bookId, chapterIndex, buttonPosition) {
 window.onload = () => {
     setMode('trending', true); // force = true -> selalu load pertama kali
 };
+
+// INFINITE SCROLL: kalau posisi scroll hampir di bawah, otomatis loadMore()
+window.addEventListener('scroll', () => {
+    const scrollPosition = window.innerHeight + window.scrollY;
+    const threshold = document.body.offsetHeight - 400; // jarak 400px dari bawah
+
+    if (scrollPosition >= threshold) {
+        loadMore();
+    }
+});
+
