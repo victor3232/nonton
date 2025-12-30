@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DramaBox Serial</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <div class="brand-pill">
+            <div class="brand-logo">
+                <span>DB</span>
+            </div>
+            <div class="brand-text">
+                <h1>DramaBox<span>Serial</span></h1>
+                <p>Streaming short drama gratis • Tanpa berlangganan</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- HOME -->
+    <section id="home-page">
+        <!-- Search -->
+        <div id="search-bar" class="search-card">
+            <div class="search-input-wrapper">
+                <span class="search-icon">🔍</span>
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="Cari judul atau tag drama..."
+                >
+            </div>
+            <button id="search-btn" class="search-btn" onclick="searchDrama()">Cari</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="filter-row">
+            <button id="trending-btn" class="tab-btn active" onclick="setMode('trending')">
+                🔥 Trending
+            </button>
+            <button id="latest-btn" class="tab-btn" onclick="setMode('latest')">
+                🌟 Terbaru
+            </button>
+            <button id="random-btn" class="tab-btn" onclick="setMode('random')">
+                ⚡ Rekomendasi
+            </button>
+        </div>
+
+        <!-- Section title -->
+        <div class="section-head">
+            <div>
+                <h2>Terbaru!</h2>
+                <p>Nikmati update drama setiap hari secara gratis.</p>
+            </div>
+        </div>
+
+        <!-- List drama -->
+        <div id="drama-list" class="loading">Loading drama...</div>
+
+        <!-- Tombol load more (disembunyikan, dipakai oleh JS / infinite scroll) -->
+        <div class="load-more-wrapper">
+            <button id="load-more-btn" class="load-more-btn" onclick="loadMore()">
+                Selanjutnya
+            </button>
+        </div>
+    </section>
+
+    <!-- DETAIL -->
+    <section id="detail-page">
+        <div class="detail-header">
+            <button class="back-btn" onclick="backToHome()">← Kembali</button>
+        </div>
+
+        <div id="drama-detail"></div>
+
+        <!-- VIDEO DI ATAS -->
+        <div id="player"></div>
+
+        <!-- EPISODE DI BAWAH -->
+        <h2 class="section-title">Daftar Episode</h2>
+        <div id="episode-list" class="loading">Loading episode...</div>
+    </section>
+</main>
+
+<footer>
+    Website sederhana unofficial untuk nonton short drama dari DramaBox.<br>
+    Tidak menyimpan video apa pun — semua streaming langsung dari sumber resmi.<br>
+    Dibuat untuk keperluan pribadi & eksperimen. Gunakan dengan bijak.
+</footer>
+
+<script src="app.js" defer></script>
+</body>
+</html>
