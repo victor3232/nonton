@@ -1,20 +1,22 @@
-// Konfigurasi API
+// ================== KONFIGURASI API ==================
 const API_BASE = 'https://restxdb.onrender.com/api';
 const LANG = 'in';
 
-// State global
-let currentMode = 'trending';     // 'trending' | 'latest' | 'random' | 'search'
+// ================== STATE GLOBAL ==================
+let currentMode = 'trending';   // 'trending' | 'latest' | 'random' | 'search'
 let currentPage = 1;
 let currentSearch = '';
-let maxPageTrending = 5;          // bisa kamu naikkan kalau mau
+
+let maxPageTrending = 5;        // boleh dinaikkan
 let maxPageLatest = 10;
 let maxPageSearch = 5;
-let currentDramas = [];           // semua yang sudah dimuat di list
 
-// Untuk detail
-let lastChapters = [];
+let currentDramas = [];         // daftar drama yang sedang ditampilkan
+let lastChapters = [];          // chapter list untuk detail
 
-// Util kecil untuk toggle loading
+let isLoading = false;          // mencegah loadMore dipanggil berkali-kali
+
+// ================== UTIL ==================
 function setLoadingList(text) {
     const list = document.getElementById('drama-list');
     list.classList.add('loading');
@@ -26,9 +28,9 @@ function clearLoadingList() {
     list.classList.remove('loading');
 }
 
-// Ganti mode (trending / terbaru / rekomendasi)
-function setMode(mode, force = true) {
-    // kalau user klik tab yg sama berkali-kali, kita boleh abaikan
+// ================== MODE (TAB) ==================
+function setMode(mode, force = false) {
+    // kalau mode sama dan tidak dipaksa, tidak perlu reload
     if (currentMode === mode && !force) return;
 
     currentMode = mode;
@@ -36,22 +38,23 @@ function setMode(mode, force = true) {
     currentDramas = [];
     document.getElementById('drama-list').innerHTML = '';
 
-    // toggle tab button
+    // reset highlight tab
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     if (mode === 'trending') document.getElementById('trending-btn').classList.add('active');
     if (mode === 'latest') document.getElementById('latest-btn').classList.add('active');
     if (mode === 'random') document.getElementById('random-btn').classList.add('active');
 
-    loadMore(true); // selalu load data untuk mode baru
+    // mulai load data mode baru
+    loadMore(true);
 }
 
-// Dipanggil tombol "Muat Lagi"
+// ================== LOAD MORE (DIPAKAI INFINITE SCROLL) ==================
 function loadMore(reset = false) {
-    // kalau lagi loading, jangan load lagi (kecuali reset pertama kali)
+    // kalau lagi loading dan ini bukan reset pertama → jangan jalan
     if (isLoading && !reset) return;
     isLoading = true;
 
-    const btn = document.getElementById('load-more-btn');
+    const btn = document.getElementById('load-more-btn'); // tombol disembunyikan di CSS, tapi tetap dicek
     if (btn) {
         btn.disabled = true;
         btn.textContent = 'Memuat selanjutnya...';
@@ -80,7 +83,7 @@ function loadMore(reset = false) {
     }
 }
 
-/* ==================  LIST DRAMA  ================== */
+// ================== LIST DRAMA: TRENDING / TERBARU / RANDOM / SEARCH ==================
 
 // Trending = /rank/{page}
 async function loadTrending() {
@@ -120,10 +123,9 @@ async function loadLatest() {
     }
 }
 
-// Random / rekomendasi = pakai endpoint for you (kalau ada), fallback rank
+// Random / rekomendasi (gunakan rank random page)
 async function loadRandom() {
     try {
-        // kalau endpoint /foryou tidak ada, kamu bisa ganti jadi rank random page
         const randomPage = Math.floor(Math.random() * 10) + 1;
         const res = await fetch(`${API_BASE}/rank/${randomPage}?lang=${LANG}`);
         const json = await res.json();
@@ -145,11 +147,14 @@ function searchDrama() {
     currentPage = 1;
     currentDramas = [];
     document.getElementById('drama-list').innerHTML = '';
+
+    // hilangkan highlight tab (karena ini mode search)
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
     loadMore(true);
 }
 
+// Load page pencarian berikutnya
 async function loadSearchPage() {
     if (currentPage > maxPageSearch) {
         clearLoadingList();
@@ -170,10 +175,11 @@ async function loadSearchPage() {
     }
 }
 
-// Tambah hasil drama ke grid
+// Tambahkan drama ke grid
 function appendDramas(dramas, options = {}) {
     clearLoadingList();
     const listEl = document.getElementById('drama-list');
+
     if (!dramas || dramas.length === 0) {
         if (currentDramas.length === 0) {
             listEl.innerHTML = '<p style="padding:20px;">Tidak ada drama ditemukan.</p>';
@@ -212,15 +218,14 @@ function appendDramas(dramas, options = {}) {
     listEl.innerHTML = html;
 }
 
-/* ==================  DETAIL & EPISODE  ================== */
-
+// ================== DETAIL & EPISODE ==================
 function backToHome() {
     document.getElementById('home-page').style.display = 'block';
     document.getElementById('detail-page').style.display = 'none';
     document.getElementById('player').innerHTML = '';
 }
 
-// Tampilkan detail drama + list episode
+// Tampilkan detail drama dan ambil daftar episode
 async function showDetail(index) {
     const drama = currentDramas[index];
     if (!drama) {
@@ -281,7 +286,7 @@ async function showDetail(index) {
         });
         document.getElementById('episode-list').innerHTML = epHtml;
 
-        // Auto play episode 1
+        // auto play episode pertama
         playEpisode(bookId, chapters[0].chapterIndex, 0);
     } catch (err) {
         document.getElementById('episode-list').innerHTML =
@@ -289,9 +294,9 @@ async function showDetail(index) {
     }
 }
 
-// Play episode melalui endpoint watch
+// Play episode via endpoint watch
 async function playEpisode(bookId, chapterIndex, buttonPosition) {
-    // highlight
+    // highlight episode aktif
     document.querySelectorAll('.episode-btn').forEach(btn => btn.classList.remove('playing'));
     const buttons = document.querySelectorAll('.episode-btn');
     if (buttons[buttonPosition]) buttons[buttonPosition].classList.add('playing');
@@ -334,19 +339,17 @@ async function playEpisode(bookId, chapterIndex, buttonPosition) {
     }
 }
 
-/* ==================  INIT  ================== */
-
+// ================== INIT & INFINITE SCROLL ==================
 window.onload = () => {
-    setMode('trending', true); // force = true -> selalu load pertama kali
+    setMode('trending', true); // load trending saat pertama dibuka
 };
 
-// INFINITE SCROLL: kalau posisi scroll hampir di bawah, otomatis loadMore()
+// kalau posisi scroll mendekati bawah, otomatis loadMore()
 window.addEventListener('scroll', () => {
     const scrollPosition = window.innerHeight + window.scrollY;
-    const threshold = document.body.offsetHeight - 400; // jarak 400px dari bawah
+    const threshold = document.body.offsetHeight - 400; // 400px dari bawah
 
     if (scrollPosition >= threshold) {
         loadMore();
     }
-});
-
+}); 
