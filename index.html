@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DramaBox Nonton Sederhana</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-inner">
+            <h1>DramaBox Nonton Sederhana</h1>
+            <p>Unofficial • Streaming Short Drama Gratis • API dari restxdb.onrender.com</p>
+        </div>
+    </header>
+
+    <main>
+        <section id="home-page">
+            <div id="search-bar">
+                <input type="text" id="search-input" placeholder="Cari judul drama (contoh: CEO, cinta)">
+                <button id="search-btn" onclick="searchDrama()">Cari</button>
+            </div>
+
+            <div class="filter-row">
+                <button id="trending-btn" class="tab-btn active" onclick="setMode('trending')">Trending</button>
+                <button id="latest-btn" class="tab-btn" onclick="setMode('latest')">Terbaru</button>
+                <button id="random-btn" class="tab-btn" onclick="setMode('random')">Rekomendasi</button>
+            </div>
+
+            <div id="drama-list" class="loading">Loading drama...</div>
+
+            <div class="load-more-wrapper">
+                <button id="load-more-btn" class="load-more-btn" onclick="loadMore()">Muat Lagi</button>
+            </div>
+        </section>
+
+        <section id="detail-page">
+            <div class="detail-header">
+                <button class="back-btn" onclick="backToHome()">← Kembali</button>
+            </div>
+
+            <div id="drama-detail"></div>
+
+            <h2 class="section-title">Daftar Episode</h2>
+            <div id="episode-list" class="loading">Loading episode...</div>
+
+            <div id="player"></div>
+        </section>
+    </main>
+
+    <footer>
+        Website sederhana unofficial untuk nonton short drama dari DramaBox.<br>
+        Tidak menyimpan video apa pun — semua streaming langsung dari sumber resmi.<br>
+        Dibuat untuk keperluan pribadi & eksperimen. Gunakan dengan bijak.
+    </footer>
+
+    <script src="app.js" defer></script>
+</body>
+</html>
