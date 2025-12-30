@@ -27,8 +27,9 @@ function clearLoadingList() {
 }
 
 // Ganti mode (trending / terbaru / rekomendasi)
-function setMode(mode) {
-    if (currentMode === mode) return;
+function setMode(mode, force = false) {
+    // kalau user klik tab yg sama berkali-kali, kita boleh abaikan
+    if (currentMode === mode && !force) return;
 
     currentMode = mode;
     currentPage = 1;
@@ -41,7 +42,7 @@ function setMode(mode) {
     if (mode === 'latest') document.getElementById('latest-btn').classList.add('active');
     if (mode === 'random') document.getElementById('random-btn').classList.add('active');
 
-    loadMore(true);
+    loadMore(true); // selalu load data untuk mode baru
 }
 
 // Dipanggil tombol "Muat Lagi"
@@ -334,5 +335,5 @@ async function playEpisode(bookId, chapterIndex, buttonPosition) {
 /* ==================  INIT  ================== */
 
 window.onload = () => {
-    setMode('trending'); // otomatis load banyak film dari API
+    setMode('trending', true); // force = true -> selalu load pertama kali
 };
