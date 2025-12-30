@@ -27,7 +27,7 @@ function clearLoadingList() {
 }
 
 // Ganti mode (trending / terbaru / rekomendasi)
-function setMode(mode, force = false) {
+function setMode(mode, force = true) {
     // kalau user klik tab yg sama berkali-kali, kita boleh abaikan
     if (currentMode === mode && !force) return;
 
