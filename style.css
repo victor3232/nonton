@@ -354,6 +354,31 @@ main {
     color: #e5e7eb;
 }
 
+/* PLAYER PAGE */
+
+#player-page {
+    display: none;
+    margin-top: 4px;
+}
+
+.player-meta {
+    margin: 0 0 10px;
+    text-align: left;
+}
+
+.player-meta-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.player-meta-ep {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #facc15;
+    margin-bottom: 2px;
+}
+
 /* PLAYER */
 
 #player {
@@ -389,7 +414,7 @@ main {
 .episode-btn {
     background: rgba(15,23,42,0.95);
     padding: 10px 6px;
-    border-radius: 999px;
+    border-radius: 14px;
     cursor: pointer;
     font-size: 12px;
     border: 1px solid rgba(55,65,81,0.9);
@@ -402,9 +427,10 @@ main {
 }
 
 .episode-btn.playing {
-    background: linear-gradient(135deg, #6366f1, #ec4899);
-    border-color: transparent;
-    color: #f9fafb;
+    background: #facc15;
+    border-color: #facc15;
+    color: #111827;
+    font-weight: 600;
 }
 
 /* LOADING */
