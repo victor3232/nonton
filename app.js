@@ -190,7 +190,14 @@ function appendDramas(dramas, options = {}) {
     const startIndex = currentDramas.length;
     currentDramas = currentDramas.concat(dramas);
 
-    let html = listEl.innerHTML;
+    // =========================
+    // FIX: BERSIHKAN "Loading drama..."
+    // =========================
+    let html = listEl.innerHTML.trim();
+    if (html.includes('Loading drama')) {
+        html = '';
+    }
+
     dramas.forEach((drama, i) => {
         const idx = startIndex + i;
         const cover = drama.cover || 'https://via.placeholder.com/240x400?text=No+Cover';
