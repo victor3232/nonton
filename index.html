@@ -10,15 +10,10 @@
 
 <header class="header">
     <div class="header-inner">
-        <div class="brand-pill">
-            <div class="brand-logo">
-                <span>DB</span>
-            </div>
-            <div class="brand-text">
-                <h1>DramaBox<span>Serial</span></h1>
-                <p>Streaming short drama gratis • Tanpa berlangganan</p>
-            </div>
+        <div class="brand">
+            <h1><span class="highlight">Drama</span>Box</h1>
         </div>
+        <button class="search-toggle">🔍</button>
     </div>
 </header>
 
@@ -38,31 +33,37 @@
             <button id="search-btn" class="search-btn" onclick="searchDrama()">Cari</button>
         </div>
 
-        <!-- Tabs -->
-        <div class="filter-row">
-            <button id="trending-btn" class="tab-btn active" onclick="setMode('trending')">
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button id="trending-btn" class="filter-tab active" onclick="setMode('trending')">
                 🔥 Trending
             </button>
-            <button id="latest-btn" class="tab-btn" onclick="setMode('latest')">
-                🌟 Terbaru
+            <button id="latest-btn" class="filter-tab" onclick="setMode('latest')">
+                ⭐ Terbaru
             </button>
-            <button id="random-btn" class="tab-btn" onclick="setMode('random')">
+            <button id="random-btn" class="filter-tab" onclick="setMode('random')">
                 ⚡ Rekomendasi
             </button>
         </div>
 
-        <!-- Section title -->
-        <div class="section-head">
-            <div>
-                <h2>Terbaru!</h2>
-                <p>Nikmati update drama setiap hari secara gratis.</p>
-            </div>
+        <!-- Quick Filters -->
+        <div class="quick-filters">
+            <button class="quick-filter-btn">Genre</button>
+            <button class="quick-filter-btn">Eksplorasi</button>
+            <button class="quick-filter-btn">Jadwal</button>
         </div>
 
-        <!-- List drama -->
-        <div id="drama-list" class="loading">Loading drama...</div>
+        <!-- Section Header -->
+        <div class="section-header">
+            <div class="section-border"></div>
+            <h2 class="section-title">Episode Terbaru</h2>
+            <a href="#" class="see-all">Lihat Semua ›</a>
+        </div>
 
-        <!-- Tombol load more (disembunyikan, dipakai oleh JS / infinite scroll) -->
+        <!-- Drama Grid -->
+        <div id="drama-list" class="drama-grid loading">Loading drama...</div>
+
+        <!-- Load More -->
         <div class="load-more-wrapper">
             <button id="load-more-btn" class="load-more-btn" onclick="loadMore()">
                 Selanjutnya
@@ -70,7 +71,7 @@
         </div>
     </section>
 
-    <!-- DETAIL -->
+    <!-- DETAIL PAGE -->
     <section id="detail-page">
         <div class="detail-header">
             <button class="back-btn" onclick="backToHome()">← Kembali</button>
@@ -78,19 +79,24 @@
 
         <div id="drama-detail"></div>
 
-        <!-- VIDEO DI ATAS -->
+        <!-- VIDEO PLAYER -->
         <div id="player"></div>
 
-        <!-- EPISODE DI BAWAH -->
-        <h2 class="section-title">Daftar Episode</h2>
-        <div id="episode-list" class="loading">Loading episode...</div>
+        <!-- EPISODES -->
+        <div class="section-header">
+            <div class="section-border"></div>
+            <h2 class="section-title">Daftar Episode</h2>
+        </div>
+        <div id="episode-list" class="episode-grid loading">Loading episode...</div>
     </section>
 </main>
 
 <footer>
-    Website sederhana unofficial untuk nonton short drama dari DramaBox.<br>
-    Tidak menyimpan video apa pun – semua streaming langsung dari sumber resmi.<br>
-    Dibuat untuk keperluan pribadi & eksperimen. Gunakan dengan bijak.
+    <div class="footer-content">
+        <p>Website sederhana unofficial untuk nonton short drama dari DramaBox.</p>
+        <p>Tidak menyimpan video apa pun – semua streaming langsung dari sumber resmi.</p>
+        <p>Dibuat untuk keperluan pribadi & eksperimen. Gunakan dengan bijak.</p>
+    </div>
 </footer>
 
 <script src="app.js" defer></script>
