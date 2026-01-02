@@ -1,5 +1,6 @@
 // ================== KONFIGURASI API ==================
 const API_BASE = 'https://restxdb.onrender.com/api';
+const ANIME_API = 'https://api.sansekai.my.id/api';
 const LANG = 'in';
 
 // ================== STATE GLOBAL ==================
@@ -135,6 +136,13 @@ async function loadRandom() {
         document.getElementById('drama-list').innerHTML =
             `<p style="padding:20px;">Error load rekomendasi: ${err}</p>`;
     }
+}
+
+function setCategory(type) {
+    currentCategory = type;
+    page = 1;
+    list.innerHTML = '';
+    loadData();
 }
 
 // Pencarian
