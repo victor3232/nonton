@@ -229,13 +229,12 @@ main {
 
 /* ==================== FILTER TABS ==================== */
 
-.filter-tabs {
+.filter-tab {
   display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 0 12px;      /* 🔥 ini yang bikin tidak nempel kiri kanan */
-  scroll-behavior: smooth;
-  white-space: nowrap;
+  align-items: center;
+  justify-content: flex-start;   /* 👉 bikin tulisan tidak ketarik ke tengah */
+  gap: 6px;                      /* jarak emoji & teks pas */
+  padding: 8px 14px;
 }
 
 .filter-tabs::-webkit-scrollbar {
