@@ -229,10 +229,28 @@ main {
 
 /* ==================== FILTER TABS ==================== */
 
+/* ==================== FILTER TABS ==================== */
+
 .filter-tabs {
   display: flex;
   gap: 10px;
   overflow-x: auto;
+  
+  /* PERBAIKAN DI SINI */
+  justify-content: flex-start; /* Pastikan item mulai dari kiri */
+  width: auto;                 /* Mengikuti lebar konten */
+  
+  /* Trik "Negative Margin" untuk melawan padding main 20px */
+  margin-left: -20px; 
+  margin-right: -20px;
+  
+  /* Tambahkan padding agar tombol pertama tetap sejajar dengan judul lain */
+  padding-left: 20px;
+  padding-right: 20px; /* Supaya tombol terakhir tidak nempel banget ke kanan */
+  
+  /* Agar scroll halus */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .filter-tabs::-webkit-scrollbar {
