@@ -230,11 +230,9 @@ main {
 /* ==================== FILTER TABS ==================== */
 
 .filter-tabs {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    overflow-x: auto;
-    scrollbar-width: none;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
 }
 
 .filter-tabs::-webkit-scrollbar {
