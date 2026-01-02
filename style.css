@@ -231,6 +231,21 @@ main {
     display: none;
 }
 
+.filter-tab-icon {
+    display: inline-block;
+    margin-right: 6px;
+}
+
+/* Animasi saat tab aktif */
+.filter-tab.active .filter-tab-icon {
+    animation: pulse 1.3s infinite;
+}
+
+/* Animasi saat di-hover */
+.filter-tab:hover .filter-tab-icon {
+    animation: pulse 1.3s infinite;
+}
+
 .filter-tab {
     padding: 10px 20px;
     border-radius: 24px;
