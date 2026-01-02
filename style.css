@@ -229,10 +229,11 @@ main {
 
 /* ==================== FILTER TABS ==================== */
 
-.filter-tabs {
+.filter-tab {
   display: flex;
-  gap: 10px;
-  overflow-x: auto;
+  align-items: center;
+  gap: 6px;      /* jarak icon & text */
+  padding: 10px 14px;
 }
 
 .filter-tabs::-webkit-scrollbar {
