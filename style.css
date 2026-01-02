@@ -233,22 +233,21 @@ main {
 
 .filter-tabs {
   display: flex;
-  gap: 10px;
+  gap: 8px; /* Jarak antar tombol dikurangi dikit biar hemat tempat (asalnya 10px) */
   overflow-x: auto;
   
-  /* PERBAIKAN DI SINI */
-  justify-content: flex-start; /* Pastikan item mulai dari kiri */
-  width: auto;                 /* Mengikuti lebar konten */
+  justify-content: flex-start;
+  width: auto;
   
-  /* Trik "Negative Margin" untuk melawan padding main 20px */
+  /* Menarik container keluar batas padding utama */
   margin-left: -20px; 
   margin-right: -20px;
   
-  /* Tambahkan padding agar tombol pertama tetap sejajar dengan judul lain */
-  padding-left: 20px;
-  padding-right: 20px; /* Supaya tombol terakhir tidak nempel banget ke kanan */
+  /* PENTING: Ubah ini jadi kecil (misal 10px atau 5px) */
+  /* Ini yang bikin tombol pertama start-nya lebih kiri (mepet layar) */
+  padding-left: 10px; 
   
-  /* Agar scroll halus */
+  padding-right: 20px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
