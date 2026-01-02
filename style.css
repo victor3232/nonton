@@ -232,11 +232,10 @@ main {
 .filter-tab {
   display: flex;
   align-items: center;
-  justify-content: flex-start;   /* bikin isi rata kiri */
+  justify-content: center;   /* biar tidak jatuh */
   gap: 6px;
-  padding: 8px 16px;
-  flex: 0 0 auto;                /* ❗ BIAR TIDAK NGEMBANG & TIDAK TURUN */
-  width: fit-content;            /* pastikan ukuran sesuai konten */
+  padding: 8px 18px 8px 12px;  /* kanan lebih besar → terlihat agak kiri */
+  flex-shrink: 0;              /* ❗ anti turun */
 }
 
 .filter-tabs::-webkit-scrollbar {
