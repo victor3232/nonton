@@ -229,12 +229,12 @@ main {
 
 /* ==================== FILTER TABS ==================== */
 
-.filter-tab {
+.filter-tabs {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;   /* 👉 bikin tulisan tidak ketarik ke tengah */
-  gap: 6px;                      /* jarak emoji & teks pas */
-  padding: 8px 14px;
+  gap: 12px;
+  overflow-x: auto;
+  flex-wrap: nowrap;     /* ❗ wajib biar tidak turun */
+  white-space: nowrap;
 }
 
 .filter-tabs::-webkit-scrollbar {
