@@ -233,17 +233,19 @@ main {
 
 .filter-tabs {
   display: flex;
-  gap: 8px;
+  gap: 8px; /* Jarak antar tombol dikurangi dikit biar hemat tempat (asalnya 10px) */
   overflow-x: auto;
   
   justify-content: flex-start;
   width: auto;
   
+  /* Menarik container keluar batas padding utama */
   margin-left: -20px; 
   margin-right: -20px;
   
-  /* UBAH INI DARI 10px JADI 0 */
-  padding-left: 0; 
+  /* PENTING: Ubah ini jadi kecil (misal 10px atau 5px) */
+  /* Ini yang bikin tombol pertama start-nya lebih kiri (mepet layar) */
+  padding-left: 10px; 
   
   padding-right: 20px;
   scroll-behavior: smooth;
@@ -270,12 +272,18 @@ main {
 }
 
 .filter-tab {
-    padding: 10px 20px;
+    /* PENTING: Ubah padding ini */
+    /* Atas-Bawah 8px, Kiri-Kanan 14px (biar teks Trending gak terlalu ke kanan) */
+    padding: 8px 14px; 
+    
     border-radius: 24px;
     background: var(--bg-card);
     border: 1px solid var(--border);
     color: var(--text-soft);
-    font-size: 14px;
+    
+    /* Opsional: Kecilkan font sedikit biar makin muat banyak */
+    font-size: 13px; 
+    
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
